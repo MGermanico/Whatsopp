@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,14 +20,13 @@ import java.util.logging.Logger;
  */
 public class ConnectionTest {
     public static void main(String[] args) {
-        try(Socket conexionServidor = new Socket("192.168.11.51", 1488);
-                DataOutputStream dos = new DataOutputStream(conexionServidor.getOutputStream())){
-            System.out.println("Me he conectado al servidor");
-            dos.writeUTF("hola costi");
-            System.out.println("enviando");
-//            DataInputStream dis = new DataInputStream(conexionServidor.getInputStream());
-//            String txt = dis.readUTF();
-//            System.out.println("ok");
+        DataInputStream dip;
+        try(ServerSocket conexionServidor = new ServerSocket(1488)){
+            Socket socketCliente = conexionServidor.accept();
+            System.out.println("Cliente conectado al servidor");
+            dip = new DataInputStream(socketCliente.getInputStream());
+            String text = dip.readUTF();
+            System.out.println(text);
         }catch(Exception e){
             e.printStackTrace();
         }
