@@ -105,7 +105,7 @@ public class Message {
         }else if(type == FILE_TYPE){
             return "Se ha guardado el archivo " + this.file.getName();
         }else{
-            return "[MENSAJE VACIO]";
+            return null;
         }
     }
     

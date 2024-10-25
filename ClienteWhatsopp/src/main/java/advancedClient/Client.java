@@ -19,54 +19,81 @@ import java.util.logging.Logger;
  * @author migue
  */
 public class Client {
+
     private Socket socket = null;
 
     private String ip = null;
     private String nombre = null;
     private OutputStream out = null;
     private InputStream inp = null;
-    
+
     public Client(Socket socket, String nombre) {
-        try{
+        try {
             this.nombre = nombre;
             this.socket = socket;
-            out = socket.getOutputStream();
+            this.out = socket.getOutputStream();
             inp = socket.getInputStream();
             listenForMessage();
             enviarMensaje();
         } catch (IOException ex) {
+            ex.printStackTrace();
             closeAll();
         }
     }
-    
-    public void enviarMensaje(){
-        try (Scanner scanner = new Scanner(System.in);){
-            
+
+    public void enviarMensaje() {
+        try {
+
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
-            writer.write(nombre);
+            writer.write(nombre + "\n");
             writer.flush();
-            System.out.println("NOMBRE ENVIADO" + nombre);
-            Message message;
-            while(socket.isConnected()){
-                message = new Message(scanner.nextLine());
-                message.sendMessage(out);
-            }
+            System.out.println("NOMBRE ENVIADO " + nombre);
+
+            
         } catch (IOException ex) {
+            ex.printStackTrace();
             closeAll();
         }
+//        try (Scanner scanner = new Scanner(System.in);) {
+//            
+//            while (socket.isConnected()) {
+//                enviarMsg(scanner);
+//            }
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//            closeAll();
+//        }
+        
     }
-    
-    public void listenForMessage(){
+
+    private void enviarMsg(Scanner scanner) throws IOException {
+//        Scanner sc = new Scanner(System.in);
+        
+        try{
+            Message message;
+            message = new Message(scanner.nextLine());
+            System.out.println("se envia: " + message);
+            message.sendMessage(out);
+        }catch(java.util.NoSuchElementException ex){
+        }
+    }
+
+    public void listenForMessage() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String mensajeDelGrupo;
-                
-                while(socket.isConnected()){
-                    try{
+
+                while (socket.isConnected()) {
+                    try {
                         Message m = new Message(inp);
-                        m.toString();
-                    }catch(IOException e){
+                        if (m.toString() != null) {
+                            System.out.println(m.toString());
+                        }else{
+                            System.out.println("ES NULL");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                         closeAll();
                     }
                 }
@@ -75,7 +102,7 @@ public class Client {
     }
 
     private void closeAll() {
-        try{
+        try {
             if (socket != null) {
                 socket.close();
             }
@@ -85,23 +112,23 @@ public class Client {
             if (inp != null) {
                 inp.close();
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-     public static void main(String[] args) {
+
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.print("Introduce tu nombre de usuario: ");
         String nombre = sc.nextLine();
-
         try (Socket socket = new Socket("localhost", 1488);) {
             Client client = new Client(socket, nombre);
             client.listenForMessage();
             client.enviarMensaje();
         } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
 
     }
+
 }

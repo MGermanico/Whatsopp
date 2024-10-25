@@ -27,12 +27,13 @@ class ClientHandler implements Runnable{
         try {
             this.socket = socket;
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//            socket.setSoTimeout(5000);
             this.nombre = reader.readLine();
             clientHandlers.add(this);
             System.out.println("START HANDLER");
             // broadcastMessage("SERVER: " + this.nombre + " se ha unido al chat!");
         } catch (IOException ex) {
-            cerrarTodo(socket, reader);
+//            cerrarTodo(socket, reader);
             Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -49,7 +50,7 @@ class ClientHandler implements Runnable{
                 os = socket.getOutputStream();
                 os.write(mensajeDelCliente);
             } catch (IOException e) {
-                cerrarTodo(socket, reader);
+//                cerrarTodo(socket, reader);
                 break;
             } finally{
                 if(os != null){
