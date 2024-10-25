@@ -35,6 +35,7 @@ public class ClientHandler implements Runnable{
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.nombre = reader.readLine();
+            
             clientHandlers.add(this);
             broadcastMessage("SERVER: " + this.nombre + " se ha unido al chat!");
         } catch (IOException ex) {
