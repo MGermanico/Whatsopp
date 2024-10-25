@@ -6,13 +6,16 @@ package advancedClient;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,11 +49,17 @@ public class Message {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inp));
             this.text += reader.readLine();
         }else if (type == FILE_TYPE) {
-//            byte[] buffer = new byte[4096];
-//            int bytesLeidos;
-//
-//            while ((bytesLeidos = inp.read(buffer)) != -1) {
-//            fos.write(buffer, 0, bytesLeidos);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inp));
+            String fileName = br.readLine();
+            file = new File("src/main/java/img/" + fileName);
+            FileOutputStream fos = new FileOutputStream(file);
+            
+            byte[] buffer = new byte[4096];
+            int bytesLeidos;
+
+            while ((bytesLeidos = inp.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesLeidos);
+            }
         }
     }
 
@@ -71,7 +80,14 @@ public class Message {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
             writer.write(text);
         }else if (type == FILE_TYPE) {
+            String fName = file.getName();
+            // out.write();
             FileInputStream fis = new FileInputStream(file);
+            
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+            writer.write(fName);
+            
+            
             byte[] buffer = new byte[4096];
             int bytesLeidos;
 
@@ -81,4 +97,17 @@ public class Message {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        if (type == STRING_TYPE) {
+            return this.text;
+        }else if(type == FILE_TYPE){
+            return "Se ha guardado el archivo " + this.file.getName();
+        }else{
+            return "[MENSAJE VACIO]";
+        }
+    }
+    
+    
 }

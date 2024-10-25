@@ -1,20 +1,21 @@
+
+import java.net.ServerSocket;
+import java.net.Socket;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package advancedServer;
-
-import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  *
  * @author migue
  */
-public class Server {
+public class Servidor {
+    
     private ServerSocket serverSocket;
 
-    public Server(ServerSocket serverSocket) {
+    public Servidor(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
     
@@ -29,7 +30,6 @@ public class Server {
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
-            System.out.println("END");
         }catch(Exception e){
             e.printStackTrace();
         }

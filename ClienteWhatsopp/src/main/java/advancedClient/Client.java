@@ -4,9 +4,11 @@
  */
 package advancedClient;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -24,8 +26,9 @@ public class Client {
     private OutputStream out = null;
     private InputStream inp = null;
     
-    public Client(Socket socket) {
+    public Client(Socket socket, String nombre) {
         try{
+            this.nombre = nombre;
             this.socket = socket;
             out = socket.getOutputStream();
             inp = socket.getInputStream();
@@ -38,9 +41,12 @@ public class Client {
     
     public void enviarMensaje(){
         try (Scanner scanner = new Scanner(System.in);){
-            System.out.println("\tESCRIBE TU NOMBRE: ");
-            //envia el nombre
-            Message message = new Message(scanner.nextLine());
+            
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+            writer.write(nombre);
+            writer.flush();
+            System.out.println("NOMBRE ENVIADO" + nombre);
+            Message message;
             while(socket.isConnected()){
                 message = new Message(scanner.nextLine());
                 message.sendMessage(out);
@@ -55,14 +61,15 @@ public class Client {
             @Override
             public void run() {
                 String mensajeDelGrupo;
-//                
-//                while(socket.isConnected()){
-//                    try{
-//                        
-//                    }catch(IOException e){
-//                        closeAll();
-//                    }
-//                }
+                
+                while(socket.isConnected()){
+                    try{
+                        Message m = new Message(inp);
+                        m.toString();
+                    }catch(IOException e){
+                        closeAll();
+                    }
+                }
             }
         }).start();
     }
@@ -83,5 +90,18 @@ public class Client {
         }
     }
     
-    
+     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Introduce tu nombre de usuario: ");
+        String nombre = sc.nextLine();
+
+        try (Socket socket = new Socket("localhost", 1488);) {
+            Client client = new Client(socket, nombre);
+            client.listenForMessage();
+            client.enviarMensaje();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
 }
