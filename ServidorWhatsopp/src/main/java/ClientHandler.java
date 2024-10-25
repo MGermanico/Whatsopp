@@ -52,6 +52,10 @@ public class ClientHandler implements Runnable{
             try{
                 mensajeDelCliente = reader.readLine();
                 broadcastMessage(mensajeDelCliente);
+                if (mensajeDelCliente == null){
+                    cerrarTodo(socket, reader, writer);
+                    break;
+                }
             }catch(IOException e){
                 cerrarTodo(socket, reader, writer);
                 break;
@@ -62,7 +66,7 @@ public class ClientHandler implements Runnable{
     public void broadcastMessage(String mensaje){
         System.out.print("se va a enviar : \"" + mensaje + "\"");
         for (ClientHandler clientHandler : clientHandlers) {
-            System.out.println(" a " + clientHandler.nombre);
+            System.out.println(" de " + clientHandler.nombre);
             try{
                 if (!clientHandler.getNombre().equals(this.nombre)) {
                     clientHandler.getWriter().write(mensaje);

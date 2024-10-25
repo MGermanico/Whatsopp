@@ -55,14 +55,14 @@ public class Client {
             @Override
             public void run() {
                 String mensajeDelGrupo;
-                
-                while(socket.isConnected()){
-                    try{
-                        
-                    }catch(IOException e){
-                        closeAll();
-                    }
-                }
+//                
+//                while(socket.isConnected()){
+//                    try{
+//                        
+//                    }catch(IOException e){
+//                        closeAll();
+//                    }
+//                }
             }
         }).start();
     }

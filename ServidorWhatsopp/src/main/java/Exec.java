@@ -19,7 +19,7 @@ public class Exec {
             Servidor server = new Servidor(serverSocket);
             server.startServer();
         } catch (IOException ex) {
-            Logger.getLogger(Exec.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 }
