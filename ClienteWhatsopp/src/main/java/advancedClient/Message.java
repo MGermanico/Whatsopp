@@ -67,6 +67,7 @@ public class Message {
     public boolean sendMessage(OutputStream out) throws IOException{
         out.write(type);
         if (type == STRING_TYPE) {
+            
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
             writer.write(text);
         }else if (type == FILE_TYPE) {

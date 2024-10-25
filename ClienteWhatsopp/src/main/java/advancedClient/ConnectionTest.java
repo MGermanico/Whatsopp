@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class ConnectionTest {
     public static void main(String[] args) {
-        File f = new File("src/main/java/img/test.jpg");
+        File f = new File("src/main/java/img/src.zip");
         System.out.println(f.getAbsolutePath() + " : existe = " + f.exists());
         OutputStream out = null;
         try(Socket socketCliente = new Socket("localhost", 1488);

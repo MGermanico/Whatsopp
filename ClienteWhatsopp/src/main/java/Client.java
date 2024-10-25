@@ -31,7 +31,7 @@ public class Client {
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.nombre = nombre;
         } catch (IOException e) {
-            cerrarTodo(socket, reader, writer);
+            cerrarTodo(reader, writer);
         }
     }
 
@@ -44,6 +44,7 @@ public class Client {
                 String mensaje = scanner.nextLine();
                 if (mensaje.equals("*")) {
                     socket.close();
+                    cerrarTodo(reader, writer);
                     System.exit(0);
                 } else {
                     writer.write(nombre + ": " + mensaje);
@@ -52,7 +53,7 @@ public class Client {
                 }
             }
         } catch (IOException ex) {
-            cerrarTodo(socket, reader, writer);
+            cerrarTodo(reader, writer);
         }
     }
 
@@ -65,12 +66,17 @@ public class Client {
                 String mensajeDelGrupo;
 
                 while (socket.isConnected()) {
-
                     try {
                         mensajeDelGrupo = reader.readLine();
-                        System.out.println(mensajeDelGrupo);
+                        if (mensajeDelGrupo == null) {
+                            socket.close();
+                            cerrarTodo(reader, writer);
+                            System.exit(0);
+                        } else {
+                            System.out.println(mensajeDelGrupo);
+                        }
                     } catch (IOException e) {
-                        cerrarTodo(socket, reader, writer);
+                        cerrarTodo(reader, writer);
                     }
                 }
             }
@@ -79,7 +85,7 @@ public class Client {
 
     }
 
-    public void cerrarTodo(Socket socket, BufferedReader reader, BufferedWriter writer) {
+    public void cerrarTodo(BufferedReader reader, BufferedWriter writer) {
 
         try {
             if (reader != null) {
@@ -97,13 +103,6 @@ public class Client {
             e.printStackTrace();
         }
 
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         listening.interrupt();
 
     }

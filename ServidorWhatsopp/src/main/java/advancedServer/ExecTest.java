@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class ExecTest {
     public static void main(String[] args) {
-        File f = new File("src/main/java/img/cargarImg.jpg");
+        File f = new File("src/main/java/img/src.zip");
         InputStream in = null;
         Socket socketCliente = null;
         try(ServerSocket conexionServidor = new ServerSocket(1488);
