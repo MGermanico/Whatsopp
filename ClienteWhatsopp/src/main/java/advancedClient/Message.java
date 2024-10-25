@@ -81,11 +81,11 @@ public class Message {
             writer.write(text);
         }else if (type == FILE_TYPE) {
             String fName = file.getName();
-            // out.write();
+            
             FileInputStream fis = new FileInputStream(file);
             
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
-            writer.write(fName);
+//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+//            writer.write(fName);
             
             
             byte[] buffer = new byte[4096];

@@ -54,15 +54,15 @@ public class Client {
             ex.printStackTrace();
             closeAll();
         }
-//        try (Scanner scanner = new Scanner(System.in);) {
-//            
-//            while (socket.isConnected()) {
-//                enviarMsg(scanner);
-//            }
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//            closeAll();
-//        }
+        try (Scanner scanner = new Scanner(System.in);) {
+            
+            while (socket.isConnected()) {
+                enviarMsg(scanner);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            closeAll();
+        }
         
     }
 
@@ -86,7 +86,9 @@ public class Client {
 
                 while (socket.isConnected()) {
                     try {
+                        System.out.println("esperando recibir:");
                         Message m = new Message(inp);
+                        System.out.println("algo recibido");
                         if (m.toString() != null) {
                             System.out.println(m.toString());
                         }else{
@@ -123,8 +125,6 @@ public class Client {
         String nombre = sc.nextLine();
         try (Socket socket = new Socket("localhost", 1488);) {
             Client client = new Client(socket, nombre);
-            client.listenForMessage();
-            client.enviarMensaje();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

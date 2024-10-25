@@ -20,57 +20,71 @@ class ClientHandler implements Runnable{
 
     private Socket socket;
     private BufferedReader reader;
+    private OutputStream os = null;
+    private InputStream is = null;
     private String nombre;
 
 
     public ClientHandler(Socket socket) {
         try {
             this.socket = socket;
+            is = socket.getInputStream();
+            os = socket.getOutputStream();
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//            socket.setSoTimeout(5000);
             this.nombre = reader.readLine();
             clientHandlers.add(this);
             System.out.println("START HANDLER");
             // broadcastMessage("SERVER: " + this.nombre + " se ha unido al chat!");
         } catch (IOException ex) {
-//            cerrarTodo(socket, reader);
+            cerrarTodo();
             Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
+    public static final int DEFAULT_TYPE = 0;
+    public static final int STRING_TYPE = 1;
+    public static final int FILE_TYPE = 2;
+    
     @Override
     public void run() {
+        System.out.println("RUN()");
+        
         byte[] mensajeDelCliente;
-        OutputStream os = null;
-        InputStream is = null;
+        int type;
         while (socket.isConnected()) {
-            try{
-                is = socket.getInputStream();
-                mensajeDelCliente = is.readAllBytes();
-                os = socket.getOutputStream();
-                os.write(mensajeDelCliente);
+            System.out.println("bucle while SOCKET.ISCONNECTED");
+            try(FileOutputStream fos = new FileOutputStream(new File("src/main/java/img/prueba.txt"))){
+                System.out.println("leyendo y escribiendo");
+                
+                byte[] buffer = new byte[1];
+                
+                is.read(buffer);
+                type = buffer[0];
+                System.out.println("- - byte de config : " + buffer[0]);
+                
+                if (type == STRING_TYPE) {
+                    System.out.println("ES UN STRING");
+                    
+                }else if (type == FILE_TYPE) {
+                    System.out.println("ES UN FILE");
+                    buffer = new byte[4096];
+
+                    int bytesLeidos;
+                    while ((bytesLeidos = is.read(buffer)) != -1) {
+                        System.out.println("- - lee");
+                        os.write(buffer, 0, bytesLeidos);
+                    }
+                }
+                
+                System.out.println("FIN");
             } catch (IOException e) {
-//                cerrarTodo(socket, reader);
+                System.out.println("ERRORAMEN");
+                cerrarTodo();
                 break;
-            } finally{
-                if(os != null){
-                    try {
-                        os.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                if(is != null){
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
             }
         }
     }
-
+    
     public void broadcastMessage(String mensaje) {
 //        System.out.print("se va a enviar : \"" + mensaje + "\"");
 //        for (ClientHandler clientHandler : clientHandlers) {
@@ -91,17 +105,37 @@ class ClientHandler implements Runnable{
         clientHandlers.remove(this);
         broadcastMessage("SERVER: " + this.nombre + " ha salido del chat.");
     }
-    public void cerrarTodo(Socket socker, BufferedReader bufferedReader) {
+    public void cerrarTodo() {
         removeClientHandler();
-        try {
-            if(bufferedReader != null) {
-                bufferedReader.close();
-            }
-            if (socket != null) {
+        if(socket != null){
+            try {
                 socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        if(is != null){
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(os != null){
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(reader != null){
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
+    
 }
