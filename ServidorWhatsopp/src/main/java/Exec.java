@@ -1,6 +1,8 @@
 
-import java.io.DataOutputStream;
-import java.net.Socket;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -13,12 +15,11 @@ import java.net.Socket;
  */
 public class Exec {
     public static void main(String[] args) {
-        try(Socket conexionServidor = new Socket("localhost", 1488);
-                DataOutputStream dos = new DataOutputStream(conexionServidor.getOutputStream())){
-            System.out.println("Me he conectado al servidor");
-            dos.writeUTF("Mensaje de prueba");
-        }catch(Exception e){
-            e.printStackTrace();
+        try (ServerSocket serverSocket = new ServerSocket(1488);){
+            Servidor server = new Servidor(serverSocket);
+            server.startServer();
+        } catch (IOException ex) {
+            Logger.getLogger(Exec.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
