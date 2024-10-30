@@ -5,6 +5,7 @@
 package advancedClient;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author migue
  */
-public class Client {
+public class Client_test {
 
     private Socket socket = null;
 
@@ -27,21 +28,26 @@ public class Client {
     private OutputStream out = null;
     private InputStream inp = null;
 
-    public Client(Socket socket, String nombre) {
+    public Client_test(Socket socket, String nombre) {
         try {
             this.nombre = nombre;
             this.socket = socket;
             this.out = socket.getOutputStream();
             inp = socket.getInputStream();
             listenForMessage();
-            enviarMensaje();
+            sendMessages();
         } catch (IOException ex) {
             ex.printStackTrace();
             closeAll();
         }
     }
 
-    public void enviarMensaje() {
+    public void sendMessages() {
+        sendName();
+        sendLoop();
+    }
+    
+    private void sendName(){
         try {
 
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
@@ -54,30 +60,51 @@ public class Client {
             ex.printStackTrace();
             closeAll();
         }
-//        try (Scanner scanner = new Scanner(System.in);) {
-//            
-//            while (socket.isConnected()) {
-//                enviarMsg(scanner);
-//            }
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//            closeAll();
-//        }
-        
     }
 
-    private void enviarMsg(Scanner scanner) throws IOException {
-//        Scanner sc = new Scanner(System.in);
-        
+    private void sendLoop(){
+        try (Scanner scanner = new Scanner(System.in);) {
+            String txt;
+            while (socket.isConnected()) {
+                txt = scanner.nextLine();
+                sendMessage(txt);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            closeAll();
+        }
+    }
+    
+    public void sendMessage(String txt) throws IOException {
         try{
-            Message message;
-            message = new Message(scanner.nextLine());
-            System.out.println("se envia: " + message);
-            message.sendMessage(out);
+            Message message = null;
+            do{
+                if (txt.matches("archivo .+\\..+")) {
+                    message = sendFile(txt);
+                }else{
+                    message = new Message(txt);
+                }
+            }while(message == null);
+            message.sendMessage(this.nombre, out);
         }catch(java.util.NoSuchElementException ex){
         }
     }
 
+    
+    
+    private Message sendFile(String txt){
+        txt = txt.substring(8);
+        Message message = null;
+        File f;
+        f = new File(txt);
+        if (f.exists()) {
+            message = new Message(f);
+        }else{
+            System.out.println("!!! RUTA INCORRECTA !!!");
+        }
+        return message;
+    }
+    
     public void listenForMessage() {
         new Thread(new Runnable() {
             @Override
@@ -86,11 +113,11 @@ public class Client {
 
                 while (socket.isConnected()) {
                     try {
+//                        System.out.println("esperando recibir:");
                         Message m = new Message(inp);
+//                        System.out.println("algo recibido");
                         if (m.toString() != null) {
-                            System.out.println(m.toString());
-                        }else{
-                            System.out.println("ES NULL");
+                            listenMessage(m);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -100,8 +127,12 @@ public class Client {
             }
         }).start();
     }
+    
+    private void listenMessage(Message m){
+        System.out.println(m.toString());
+    }
 
-    private void closeAll() {
+    public void closeAll() {
         try {
             if (socket != null) {
                 socket.close();
@@ -122,9 +153,7 @@ public class Client {
         System.out.print("Introduce tu nombre de usuario: ");
         String nombre = sc.nextLine();
         try (Socket socket = new Socket("localhost", 1488);) {
-            Client client = new Client(socket, nombre);
-            client.listenForMessage();
-            client.enviarMensaje();
+            Client_test client = new Client_test(socket, nombre);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
